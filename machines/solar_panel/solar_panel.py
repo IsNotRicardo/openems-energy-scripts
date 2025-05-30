@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.interpolate import PchipInterpolator
 
 # The number of data points in the CSV file
 # Unit: Minutes in a day
@@ -33,10 +34,10 @@ STANDARD_IRRADIANCE = 1000
 # - Azimuth: 0° (South)
 # Unit: Watts per square meter (W/m²)
 # Values start at 0:00 and end at 23:00 local time
-HOURLY_GTI = [
+HOURLY_GTI = np.array([
     0.0, 0.0, 0.0, 0.0, 1.69, 19.98, 55.87, 180.09, 341.57, 489.86, 632.75, 721.39,
     741.11, 722.58, 647.72, 527.44, 384.08, 239.04, 97.32, 37.89, 9.11, 0.0, 0.0, 0.0
-]
+])
 
 # Performance Ratio
 # An overall metric of how efficient the solar system is after accounting for real-world energy losses
@@ -51,36 +52,32 @@ HOURLY_GTI = [
 # Unit: Percentage as a decimal (0 to 1)
 PERFORMANCE_RATIO = 0.8
 
-
-# TODO: CLEAN UP THIS AI-GENERATED CODE
-
-
-# Interpolate GTI to smooth curve
-hour_indices = np.linspace(0, 24, num=len(HOURLY_GTI), endpoint=False)
-target_indices = np.linspace(0, 24, num=DATA_POINTS, endpoint=False)
-smooth_gti = np.interp(target_indices, hour_indices, HOURLY_GTI)
+# Perform PCHIP interpolation on GTI data to reach the resolution given by DATA_POINTS
+original_x = np.linspace(0, 24, num=len(HOURLY_GTI), endpoint=False)
+target_x = np.linspace(0, 24, num=DATA_POINTS, endpoint=False)
+pchip = PchipInterpolator(original_x, HOURLY_GTI)
+interpolated_gti = pchip(target_x)
 
 # Add variability to the data
-np.random.seed(42)
-noise = np.random.normal(0, smooth_gti * VARIABILITY)
-variable_gti = smooth_gti + noise
-variable_gti[variable_gti < 0] = 0
+np.random.seed(48)
+noise = np.random.normal(0, interpolated_gti * VARIABILITY)
+variable_gti = np.maximum(interpolated_gti + noise, 0)
 
 # Calculate power production
 power_production = PANEL_POWER * (variable_gti / STANDARD_IRRADIANCE) * PERFORMANCE_RATIO
 
 # Save to CSV
-df = pd.DataFrame({'Power_Production_W': power_production})
-df.to_csv('solar_panel.csv', index=False)
+df = pd.DataFrame({"ActivePower": power_production})
+df.to_csv("solar_panel.csv", index=False)
 
 # Visualize
 plt.figure(figsize=(12, 5))
-plt.plot(df['Power_Production_W'])
-plt.title('Solar Panel Power Production (Smoothed)')
-plt.xlabel('Time Step')
-plt.ylabel('Power Production (W)')
+plt.plot(target_x, df['ActivePower'])
+plt.title("Solar Panel Power Production")
+plt.xlabel("Hour of Day")
+plt.ylabel("Power Production (W)")
 plt.grid(True)
 plt.tight_layout()
 plt.show()
 
-print(f"CSV file 'solar_panel.csv' generated successfully with {DATA_POINTS} data points.")
+print(f"Solar panel CSV file generated successfully.")
