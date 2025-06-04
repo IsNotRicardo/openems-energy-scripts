@@ -61,8 +61,7 @@ interpolated_gti = pchip(target_x)
 
 # Add variability to the data
 np.random.seed(48)
-noise = np.random.normal(0, interpolated_gti * VARIABILITY)
-variable_gti = np.maximum(interpolated_gti + noise, 0)
+variable_gti = np.random.normal(interpolated_gti, interpolated_gti * VARIABILITY)
 
 # Calculate power production
 power_production = PANEL_POWER * (variable_gti / STANDARD_IRRADIANCE) * PERFORMANCE_RATIO
