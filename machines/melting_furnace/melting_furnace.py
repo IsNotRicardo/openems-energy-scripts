@@ -23,17 +23,22 @@ FURNACE_AGE = 5
 
 # Furnace aging factor
 # The year-on-year energy consumption increase of the furnace due to aging, wear and other factors
-# Currently modeled as a linear function for simplicity
+# This value would have to be calculated depending on the specific furnace model, and how it is used
+# Currently modeled as a linear function, for simplicity
+# The value of 2% was obtained from the paper mentioned at the beginning
 # Unit: Percentage as a decimal (0 to 1)
 AGING_FACTOR = 0.02
 
 # Production quantity of the furnace in one day
 # This value can vary significantly, and depends mostly on downstream demand
+# It also depends on the type of glass that is produced, and factors such as type and size of furnace
 # There is generally little to no correlation between time of day and production capacity
+# The paper mentioned at the beginning mentions an average production of 207 tonnes of glass per day
+# Other data can be found here: https://www.glassglobal.com/consulting/reports/technology/
 # There are few sources for production over hours, so average daily production is used instead
 # This value is then spread throughout the day evenly, with some variability
 # Unit: Tons (t)
-PRODUCTION_QUANTITY = 400
+PRODUCTION_QUANTITY = 200
 
 # Production variability throughout the day
 # This value should be small (<10%), as production does not usually drastically fluctuate
@@ -42,8 +47,10 @@ PRODUCTION_VARIABILITY = 0.03
 
 # Base energy consumption of the furnace in one day
 # The energy needed to keep the furnace running without producing any glass throughout the entire day
+# The 200,000 kWh value was derived from the paper mentioned at the beginning
+# Other than that, there are little to no sources from where to obtain this value
 # Unit: Kilowatt-hour (kWh)
-BASE_CONSUMPTION = 10_000
+BASE_CONSUMPTION = 200_000
 
 # Base energy variability throughout the day
 # This value should be small (<5%), due to the very high thermal inertia of the furnace
@@ -51,6 +58,7 @@ BASE_CONSUMPTION = 10_000
 BASE_VARIABILITY = 0.02
 
 # Energy consumption per ton of glass produced
+# The source for the 1,100 kWh/t value is the paper mentioned at the beginning
 # Unit: Kilowatt-hour per ton (kWh/t)
 GLASS_CONSUMPTION = 1100
 
@@ -59,8 +67,11 @@ GLASS_CONSUMPTION = 1100
 CULLET_AMOUNT = 0.4
 
 # Energy savings percentage per 1% of cullet
+# A rule of thumb is that for every 10% of cullet, it results in energy savings of 2.5-3%
+# Source: https://www.glassglobal.com/consulting/reports/technology/
+# An energy consumption decrease of 2.6% per 10% of cullet can also be calculated from the paper at the beginning
 # Unit: Percentage as a decimal (0 to 1)
-CULLET_SAVINGS = 0.002
+CULLET_SAVINGS = 0.0025
 
 # Map base power throughout the day with variability
 np.random.seed(48)
