@@ -3,6 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.interpolate import PchipInterpolator
 
+# Hours per day
+HOURS_PER_DAY = 24
+
 # Number of data points in the CSV file
 # Unit: Minutes in a day
 DATA_POINTS = 1440
@@ -54,8 +57,8 @@ PERFORMANCE_RATIO = 0.8
 
 # Perform PCHIP interpolation on GTI data to reach the resolution given by DATA_POINTS
 # PCHIP interpolation is used since the data follows a bell curve, and it provides more accurate values
-original_x = np.linspace(0, 24, num=len(HOURLY_GTI), endpoint=False)
-target_x = np.linspace(0, 24, num=DATA_POINTS, endpoint=False)
+original_x = np.linspace(0, HOURS_PER_DAY, num=len(HOURLY_GTI), endpoint=False)
+target_x = np.linspace(0, HOURS_PER_DAY, num=DATA_POINTS, endpoint=False)
 pchip = PchipInterpolator(original_x, HOURLY_GTI)
 interpolated_gti = pchip(target_x)
 
