@@ -7,13 +7,10 @@ from matplotlib import pyplot as plt
 # One of the main sources used as a basis for the following values was the following paper:
 # https://www.glass-ts.com/site/assets/files/1015/2004_-_a_study_of_the_balance_between_furnace_operating_parameters_and_recycled_glass_in_glass_melting_furnaces.pdf
 
-# Hours per day
 HOURS_PER_DAY = 24
 
-# Decimal to percentage
 DECIMAL_TO_PERCENTAGE = 100
 
-# Watts per kilowatt
 WATTS_PER_KILOWATT = 1000
 
 # Number of data points in the CSV file

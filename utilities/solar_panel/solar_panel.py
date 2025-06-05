@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.interpolate import PchipInterpolator
 
-# Hours per day
 HOURS_PER_DAY = 24
 
 # Number of data points in the CSV file
