@@ -10,6 +10,9 @@ from matplotlib import pyplot as plt
 # Hours per day
 HOURS_PER_DAY = 24
 
+# Decimal to percentage
+DECIMAL_TO_PERCENTAGE = 100
+
 # Watts per kilowatt
 WATTS_PER_KILOWATT = 1000
 
@@ -74,7 +77,7 @@ production_series = np.random.normal(spread_production, spread_production * PROD
 # Calculate power consumption
 power_consumption = (1 + FURNACE_AGE * AGING_FACTOR) * (
         base_power_series + production_series * GLASS_CONSUMPTION * DATA_POINTS / HOURS_PER_DAY *
-        (1 - 100 * CULLET_AMOUNT * CULLET_SAVINGS)) * WATTS_PER_KILOWATT
+        (1 - DECIMAL_TO_PERCENTAGE * CULLET_AMOUNT * CULLET_SAVINGS)) * WATTS_PER_KILOWATT
 
 # Save to CSV
 df = pd.DataFrame({"ActivePower": power_consumption})
