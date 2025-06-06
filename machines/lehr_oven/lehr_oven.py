@@ -40,36 +40,22 @@ PRODUCTION_QUANTITY = 200
 # Unit: Percentage as a decimal (0 to 1)
 PRODUCTION_VARIABILITY = 0.03
 
-# Base energy consumption of the oven in one day
-# The energy needed to keep the oven running in idle mode
-# There are no sources for this value
-# Unit: Kilowatt-hour (kWh)
-BASE_CONSUMPTION = 1000
-
-# Base energy variability throughout the day
-# This value should be small (<5%), due to the very high thermal inertia of the furnace
-# Unit: Percentage as a decimal (0 to 1)
-BASE_VARIABILITY = 0.02
-
 # Energy consumption per ton of glass produced
-# Typical value ranges from 10 to 25 kWh/t
+# Typical value ranges from 10 kWh/t of electricity to 25 kWh/t of primary energy
 # Source: https://belglas.com/wp-content/uploads/2016/06/energy-consumption-glass-international.pdf
 # Values of 14 and 21 kWh calculated from oven consumption in this publication: https://mu.lehrs.be/uncategorized/test/
+# Base energy consumption (energy required while idling) is already included in this value
 # Unit: Kilowatt-hour per ton (kWh/t)
-GLASS_CONSUMPTION = 16
-
-# Map base power throughout the day with variability
-np.random.seed(48)
-base_power = BASE_CONSUMPTION / HOURS_PER_DAY
-base_power_series = np.random.normal(base_power, base_power * BASE_VARIABILITY, DATA_POINTS)
+GLASS_CONSUMPTION = 10
 
 # Map production throughout the day with variability
+np.random.seed(48)
 spread_production = PRODUCTION_QUANTITY / DATA_POINTS
 production_series = np.random.normal(spread_production, spread_production * PRODUCTION_VARIABILITY, DATA_POINTS)
 
 # Calculate power consumption
 power_consumption = (1 + OVEN_AGE * AGING_FACTOR) * (
-        base_power_series + production_series * GLASS_CONSUMPTION * DATA_POINTS / HOURS_PER_DAY) * WATTS_PER_KILOWATT
+        production_series * GLASS_CONSUMPTION * DATA_POINTS / HOURS_PER_DAY) * WATTS_PER_KILOWATT
 
 # Save to CSV
 df = pd.DataFrame({"ActivePower": power_consumption})
