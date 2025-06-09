@@ -4,6 +4,11 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
+# Disclaimer:
+# There are almost no sources concerning energy consumption of batch mixers used in the glass industry
+# The only source which contained measured and reliable data is the following link:
+# (AUTOMATIC PDF DOWNLOAD) https://cn.glassglobal.com/directory/glass/profile/documents/file.asp?AdrID=7953&ID=1614
+
 HOURS_PER_DAY = 24
 
 WATTS_PER_KILOWATT = 1000
@@ -20,15 +25,18 @@ VARIABILITY = 0.03
 # Unit: Minutes
 MIXING_TIME = 3
 
-# Time it takes to transfer raw materials from and to the mixer in minutes
+# Time it takes to transfer raw materials to and from the mixer in minutes
 # Unit: Minutes
 TRANSFER_TIME = 2
 
 # Mixer power draw per ton of raw material mixed
+# This value was obtained as a middle point from the values present in the document at the beginning
+# It states a consumption value of 1 kW/100 kg or 2 kW/ 100 kg depending on mixer type
 # Unit: Kilowatt per ton (kW/t)
 MIXER_POWER = 15
 
 # Amount of glass produced in one day
+# This value should match the value produced by the furnace, as one mixer generally feeds one furnace
 # Unit: Tons (t)
 PRODUCTION_QUANTITY = 200
 
