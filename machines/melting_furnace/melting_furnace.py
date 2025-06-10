@@ -18,6 +18,7 @@ WATTS_PER_KILOWATT = 1000
 DATA_POINTS = 1440
 
 # Age of the furnace
+# It is taken into account as the refractory lining gradually wears down due to the intense heat
 # Unit: Years
 FURNACE_AGE = 5
 
