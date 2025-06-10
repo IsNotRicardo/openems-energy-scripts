@@ -28,7 +28,7 @@ OVEN_AGE = 2
 AGING_FACTOR = 0.02
 
 # Production quantity of the oven in one day
-# This value depends on product demand, and might also be limited by the furnace output
+# This value depends on product demand, and is also limited by the input coming from the forming machine
 # There is generally little to no correlation between time of day and production capacity
 # Production values are likely similar to those of the furnace, so the same value is used here
 # Lehr ovens have a rated maximum capacity, and the production quantity should take that into account
