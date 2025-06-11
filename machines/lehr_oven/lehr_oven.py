@@ -34,7 +34,7 @@ AGING_FACTOR = 0.02
 # Lehr ovens have a rated maximum capacity, and the production quantity should take that into account
 # This value is then spread throughout the day evenly, with some variability
 # Unit: Tons (t)
-PRODUCTION_QUANTITY = 200
+PRODUCTION_QUANTITY = 50
 
 # Production variability throughout the day
 # The value is likely similar to that of the furnace, since the oven depends on the furnace output
