@@ -46,18 +46,6 @@ PRODUCTION_QUANTITY = 200
 # Unit: Percentage as a decimal (0 to 1)
 PRODUCTION_VARIABILITY = 0.03
 
-# Base energy consumption of the furnace in one day
-# The energy needed to keep the furnace running without producing any glass throughout the entire day
-# The 200,000 kWh value was derived from the paper mentioned at the beginning
-# Other than that, there are little to no sources from where to obtain this value
-# Unit: Kilowatt-hour (kWh)
-BASE_CONSUMPTION = 200_000
-
-# Base energy variability throughout the day
-# This value should be small (<5%), due to the very high thermal inertia of the furnace
-# Unit: Percentage as a decimal (0 to 1)
-BASE_VARIABILITY = 0.02
-
 # Energy consumption per ton of glass produced
 # The source for the 1,100 kWh/t value is the paper mentioned at the beginning
 # Unit: Kilowatt-hour per ton (kWh/t)
@@ -74,18 +62,14 @@ CULLET_AMOUNT = 0.4
 # Unit: Percentage as a decimal (0 to 1)
 CULLET_SAVINGS = 0.0025
 
-# Map base power throughout the day with variability
-np.random.seed(48)
-base_power = BASE_CONSUMPTION / HOURS_PER_DAY
-base_power_series = np.random.normal(base_power, base_power * BASE_VARIABILITY, DATA_POINTS)
-
 # Map production throughout the day with variability
+np.random.seed(48)
 spread_production = PRODUCTION_QUANTITY / DATA_POINTS
 production_series = np.random.normal(spread_production, spread_production * PRODUCTION_VARIABILITY, DATA_POINTS)
 
 # Calculate power consumption
 power_consumption = (1 + FURNACE_AGE * AGING_FACTOR) * (
-        base_power_series + production_series * GLASS_CONSUMPTION * DATA_POINTS / HOURS_PER_DAY *
+        production_series * GLASS_CONSUMPTION * DATA_POINTS / HOURS_PER_DAY *
         (1 - DECIMAL_TO_PERCENTAGE * CULLET_AMOUNT * CULLET_SAVINGS)) * WATTS_PER_KILOWATT
 
 # Save to CSV
