@@ -13,6 +13,8 @@ HOURS_PER_DAY = 24
 
 WATTS_PER_KILOWATT = 1000
 
+NUMBER_OF_MACHINES = 2
+
 # Number of data points in the CSV file
 # Unit: Minutes in a day
 DATA_POINTS = 1440
@@ -38,7 +40,7 @@ MIXER_POWER = 15
 # Amount of glass produced in one day
 # This value should match the value produced by the furnace, as one mixer generally feeds one furnace
 # Unit: Tons (t)
-PRODUCTION_QUANTITY = 200
+PRODUCTION_QUANTITY = 100
 
 # Raw material yield
 # Represents the amount of raw material that is converted into molten glass
@@ -54,35 +56,43 @@ production_duration = mixing_percentage * DATA_POINTS
 material_amount = PRODUCTION_QUANTITY / PRODUCTION_YIELD
 batch_size = MIXING_TIME * material_amount / production_duration
 
-# Create a production segment
-production_segment = [batch_size] * MIXING_TIME
-production_segment.extend([0] * TRANSFER_TIME)
+def generate_data(machine_number):
+    # Create a production segment
+    if machine_number % 2 == 0:
+        production_segment = [batch_size] * MIXING_TIME
+        production_segment.extend([0] * TRANSFER_TIME)
+    else:
+        production_segment = [0.0] * TRANSFER_TIME
+        production_segment.extend([batch_size] * MIXING_TIME)
 
-# Create the production time series
-production_repetition = math.ceil(DATA_POINTS / cycle_time)
-production_series = np.tile(production_segment, production_repetition)
-production_series = production_series[:DATA_POINTS]
+    # Create the production time series
+    production_repetition = math.ceil(DATA_POINTS / cycle_time)
+    production_series = np.tile(production_segment, production_repetition)
+    production_series = production_series[:DATA_POINTS]
 
-# Calculate power consumption
-power_consumption = production_series * MIXER_POWER * WATTS_PER_KILOWATT
+    # Calculate power consumption
+    power_consumption = production_series * MIXER_POWER * WATTS_PER_KILOWATT
 
-# Introduce variability to power consumption
-np.random.seed(48)
-variable_power_consumption = np.random.normal(power_consumption, power_consumption * VARIABILITY)
+    # Introduce variability to power consumption
+    np.random.seed(48 + machine_number)
+    variable_power_consumption = np.random.normal(power_consumption, power_consumption * VARIABILITY)
 
-# Save to CSV
-df = pd.DataFrame({"ActivePower": variable_power_consumption})
-df.to_csv("batch_mixer.csv", index=False)
+    # Save to CSV
+    df = pd.DataFrame({"ActivePower": variable_power_consumption})
+    df.to_csv(f"batch_mixer{machine_number}.csv", index=False)
 
-# Visualize
-target_x = np.linspace(0, HOURS_PER_DAY, num=DATA_POINTS, endpoint=False)
-plt.figure(figsize=(12, 5))
-plt.plot(target_x, df['ActivePower'])
-plt.title("Batch Mixer Power Consumption")
-plt.xlabel("Hour of Day")
-plt.ylabel("Power Consumption (W)")
-plt.grid(True)
-plt.tight_layout()
-plt.show()
+    # Visualize
+    target_x = np.linspace(0, HOURS_PER_DAY, num=DATA_POINTS, endpoint=False)
+    plt.figure(figsize=(12, 5))
+    plt.plot(target_x, df['ActivePower'])
+    plt.title(f"Batch Mixer {machine_number} Power Consumption")
+    plt.xlabel("Hour of Day")
+    plt.ylabel("Power Consumption (W)")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
 
-print(f"Batch mixer CSV file generated successfully.")
+    print(f"Batch mixer {machine_number} CSV file generated successfully.")
+
+for i in range(NUMBER_OF_MACHINES):
+    generate_data(i)

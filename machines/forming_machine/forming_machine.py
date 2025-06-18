@@ -12,6 +12,8 @@ HOURS_PER_DAY = 24
 
 WATTS_PER_KILOWATT = 1000
 
+NUMBER_OF_MACHINES = 4
+
 # Number of data points in the CSV file
 # Unit: Minutes in a day
 DATA_POINTS = 1440
@@ -25,26 +27,30 @@ VARIABILITY = 0.005
 # Unit: Kilowatt (kW)
 POWER_OUTPUT = 20
 
-# Setup values
-power_watts = POWER_OUTPUT * WATTS_PER_KILOWATT
-np.random.seed(48)
+def generate_data(machine_number):
+    # Setup values
+    power_watts = POWER_OUTPUT * WATTS_PER_KILOWATT
+    np.random.seed(48 + machine_number)
 
-# Calculate power consumption
-power_consumption = np.random.normal(power_watts, power_watts * VARIABILITY, DATA_POINTS)
+    # Calculate power consumption
+    power_consumption = np.random.normal(power_watts, power_watts * VARIABILITY, DATA_POINTS)
 
-# Save to CSV
-df = pd.DataFrame({"ActivePower": power_consumption})
-df.to_csv("forming_machine.csv", index=False)
+    # Save to CSV
+    df = pd.DataFrame({"ActivePower": power_consumption})
+    df.to_csv(f"forming_machine{machine_number}.csv", index=False)
 
-# Visualize
-target_x = np.linspace(0, HOURS_PER_DAY, num=DATA_POINTS, endpoint=False)
-plt.figure(figsize=(12, 5))
-plt.plot(target_x, df['ActivePower'])
-plt.title("Forming Machine Power Consumption")
-plt.xlabel("Hour of Day")
-plt.ylabel("Power Consumption (W)")
-plt.grid(True)
-plt.tight_layout()
-plt.show()
+    # Visualize
+    target_x = np.linspace(0, HOURS_PER_DAY, num=DATA_POINTS, endpoint=False)
+    plt.figure(figsize=(12, 5))
+    plt.plot(target_x, df['ActivePower'])
+    plt.title(f"Forming Machine {machine_number} Power Consumption")
+    plt.xlabel("Hour of Day")
+    plt.ylabel("Power Consumption (W)")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
 
-print(f"Forming machine CSV file generated successfully.")
+    print(f"Forming machine {machine_number} CSV file generated successfully.")
+
+for i in range(NUMBER_OF_MACHINES):
+    generate_data(i)

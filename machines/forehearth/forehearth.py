@@ -13,6 +13,8 @@ HOURS_PER_DAY = 24
 
 WATTS_PER_KILOWATT = 1000
 
+NUMBER_OF_MACHINES = 4
+
 # Number of data points in the CSV file
 # Unit: Minutes in a day
 DATA_POINTS = 1440
@@ -57,28 +59,32 @@ GLASS_CONSUMPTION = 0.25
 # Unit: Degrees Celsius (°C)
 TEMPERATURE_DROP = 50
 
-# Map production throughout the day with variability
-np.random.seed(48)
-spread_production = PRODUCTION_QUANTITY / DATA_POINTS
-production_series = np.random.normal(spread_production, spread_production * PRODUCTION_VARIABILITY, DATA_POINTS)
+def generate_data(machine_number):
+    # Map production throughout the day with variability
+    np.random.seed(48 + machine_number)
+    spread_production = PRODUCTION_QUANTITY / DATA_POINTS
+    production_series = np.random.normal(spread_production, spread_production * PRODUCTION_VARIABILITY, DATA_POINTS)
 
-# Calculate power consumption
-power_consumption = (1 + FOREHEARTH_AGE * AGING_FACTOR) * WATTS_PER_KILOWATT * (
-        production_series * GLASS_CONSUMPTION * TEMPERATURE_DROP * DATA_POINTS / HOURS_PER_DAY)
+    # Calculate power consumption
+    power_consumption = (1 + FOREHEARTH_AGE * AGING_FACTOR) * WATTS_PER_KILOWATT * (
+            production_series * GLASS_CONSUMPTION * TEMPERATURE_DROP * DATA_POINTS / HOURS_PER_DAY)
 
-# Save to CSV
-df = pd.DataFrame({"ActivePower": power_consumption})
-df.to_csv("forehearth.csv", index=False)
+    # Save to CSV
+    df = pd.DataFrame({"ActivePower": power_consumption})
+    df.to_csv(f"forehearth{machine_number}.csv", index=False)
 
-# Visualize
-target_x = np.linspace(0, HOURS_PER_DAY, num=DATA_POINTS, endpoint=False)
-plt.figure(figsize=(12, 5))
-plt.plot(target_x, df['ActivePower'])
-plt.title("Forehearth Power Consumption")
-plt.xlabel("Hour of Day")
-plt.ylabel("Power Consumption (W)")
-plt.grid(True)
-plt.tight_layout()
-plt.show()
+    # Visualize
+    target_x = np.linspace(0, HOURS_PER_DAY, num=DATA_POINTS, endpoint=False)
+    plt.figure(figsize=(12, 5))
+    plt.plot(target_x, df['ActivePower'])
+    plt.title(f"Forehearth {machine_number} Power Consumption")
+    plt.xlabel("Hour of Day")
+    plt.ylabel("Power Consumption (W)")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
 
-print(f"Forehearth CSV file generated successfully.")
+    print(f"Forehearth {machine_number} CSV file generated successfully.")
+
+for i in range(NUMBER_OF_MACHINES):
+    generate_data(i)
