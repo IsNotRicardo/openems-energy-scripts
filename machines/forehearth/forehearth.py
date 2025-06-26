@@ -66,8 +66,8 @@ def generate_data(machine_number):
     production_series = np.random.normal(spread_production, spread_production * PRODUCTION_VARIABILITY, DATA_POINTS)
 
     # Calculate power consumption
-    power_consumption = (1 + FOREHEARTH_AGE * AGING_FACTOR) * WATTS_PER_KILOWATT * (
-            production_series * GLASS_CONSUMPTION * TEMPERATURE_DROP * DATA_POINTS / HOURS_PER_DAY)
+    power_consumption = np.round((1 + FOREHEARTH_AGE * AGING_FACTOR) * WATTS_PER_KILOWATT * (
+            production_series * GLASS_CONSUMPTION * TEMPERATURE_DROP * DATA_POINTS / HOURS_PER_DAY)).astype(int)
 
     # Save to CSV
     df = pd.DataFrame({"ActivePower": power_consumption})
