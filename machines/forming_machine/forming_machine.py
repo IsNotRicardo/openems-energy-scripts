@@ -3,10 +3,11 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 # Disclaimer:
-# There are virtually no sources concerning the energy consumption of glass forming machines
-# A single source was found which included one power value, and this source is used as a basis for the data
-# Source: https://www.sklostroj.cz/files/attachments/leaflet-is-machines-iss.pdf
-# Due to the lack of data, no formula can be created to more accurately represent the energy consumption
+# There are very few sources concerning the energy consumption of glass forming machines
+# Only a single source was found containing an energy value per quantity, which is mentioned later
+# Additionally, the following source also states that forming accounts for 10.3% of the total energy
+# consumption and 43.1% of the total electricity consumption:
+# https://openjicareport.jica.go.jp/pdf/11187481_04.pdf
 
 HOURS_PER_DAY = 24
 
@@ -18,22 +19,34 @@ NUMBER_OF_MACHINES = 4
 # Unit: Minutes in a day
 DATA_POINTS = 1440
 
-# Variability of the data (to simulate realistic conditions)
-# Unit: Percentage as a decimal (0 to 1)
-VARIABILITY = 0.005
+# Production quantity of the forming machine in a day
+# This value depends on demand and on the number of forming machines that are used
+# Unit: Tons (t)
+PRODUCTION_QUANTITY = 50
 
-# Power output
-# The power output of the machine while operating
-# Unit: Kilowatt (kW)
-POWER_OUTPUT = 20
+# Production variability of the data (to simulate realistic conditions)
+# Unit: Percentage as a decimal (0 to 1)
+PRODUCTION_VARIABILITY = 0.01
+
+# Energy consumption per ton of glass produced
+# Two sources were found, which contained energy-related consumption values
+# The following source only contained a power value with no reference to quantity or time:
+# https://www.sklostroj.cz/files/attachments/leaflet-is-machines-iss.pdf
+# The following source contained a value of 278.8 BTU/pound, which corresponds to around 160 kWh/t:
+# https://www.aceee.org/files/proceedings/1999/data/papers/SS99_Panel1_Paper56.pdf
+# The latter value was used because it aligns better with the percentages stated at the beginning
+# Unit: Kilowatt-hour per ton (kWh/t)
+GLASS_CONSUMPTION = 160
 
 def generate_data(machine_number):
-    # Setup values
-    power_watts = POWER_OUTPUT * WATTS_PER_KILOWATT
+    # Map production throughout the day with variability
     np.random.seed(48 + machine_number)
+    spread_production = PRODUCTION_QUANTITY / DATA_POINTS
+    production_series = np.random.normal(spread_production, spread_production * PRODUCTION_VARIABILITY, DATA_POINTS)
 
     # Calculate power consumption
-    power_consumption = np.random.normal(power_watts, power_watts * VARIABILITY, DATA_POINTS)
+    power_consumption = np.round((production_series * GLASS_CONSUMPTION * DATA_POINTS / HOURS_PER_DAY)
+                                 * WATTS_PER_KILOWATT).astype(int)
 
     # Save to CSV
     df = pd.DataFrame({"ActivePower": power_consumption})
