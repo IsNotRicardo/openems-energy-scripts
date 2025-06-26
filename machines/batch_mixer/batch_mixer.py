@@ -34,8 +34,10 @@ TRANSFER_TIME = 2
 # Mixer power draw per ton of raw material mixed
 # This value was obtained as a middle point from the values present in the document at the beginning
 # It states a consumption value of 1 kW/100 kg or 2 kW/ 100 kg depending on mixer type
+# The mixers depicted seem significantly smaller than the ones required to process 100 tons per day
+# Therefore, a higher power value was chosen
 # Unit: Kilowatt per ton (kW/t)
-MIXER_POWER = 15
+MIXER_POWER = 30
 
 # Amount of glass produced in one day
 # This value should match the value produced by the furnace, as one mixer generally feeds one furnace
@@ -75,7 +77,8 @@ def generate_data(machine_number):
 
     # Introduce variability to power consumption
     np.random.seed(48 + machine_number)
-    variable_power_consumption = np.random.normal(power_consumption, power_consumption * VARIABILITY)
+    variable_power_consumption = np.round(
+        np.random.normal(power_consumption, power_consumption * VARIABILITY)).astype(int)
 
     # Save to CSV
     df = pd.DataFrame({"ActivePower": variable_power_consumption})
