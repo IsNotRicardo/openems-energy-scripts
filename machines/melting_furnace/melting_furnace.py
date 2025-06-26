@@ -47,9 +47,11 @@ PRODUCTION_QUANTITY = 200
 PRODUCTION_VARIABILITY = 0.03
 
 # Energy consumption per ton of glass produced
-# The source for the 1,100 kWh/t value is the paper mentioned at the beginning
+# The paper at the beginning is from 2004, and newer sources suggest further improvements in efficiency
+# Articles such as the one below suggest values as low as 720 kWh/t.
+# Source: https://www.eurotherm.com/us/glass-manufacture/the-efficient-future-for-the-glass-industry-is-all-electric/
 # Unit: Kilowatt-hour per ton (kWh/t)
-GLASS_CONSUMPTION = 1100
+GLASS_CONSUMPTION = 800
 
 # Amount of cullet in the raw material
 # Unit: Percentage as a decimal (0 to 1)
@@ -68,9 +70,9 @@ spread_production = PRODUCTION_QUANTITY / DATA_POINTS
 production_series = np.random.normal(spread_production, spread_production * PRODUCTION_VARIABILITY, DATA_POINTS)
 
 # Calculate power consumption
-power_consumption = (1 + FURNACE_AGE * AGING_FACTOR) * (
+power_consumption = np.round((1 + FURNACE_AGE * AGING_FACTOR) * (
         production_series * GLASS_CONSUMPTION * DATA_POINTS / HOURS_PER_DAY *
-        (1 - DECIMAL_TO_PERCENTAGE * CULLET_AMOUNT * CULLET_SAVINGS)) * WATTS_PER_KILOWATT
+        (1 - DECIMAL_TO_PERCENTAGE * CULLET_AMOUNT * CULLET_SAVINGS)) * WATTS_PER_KILOWATT).astype(int)
 
 # Save to CSV
 df = pd.DataFrame({"ActivePower": power_consumption})
