@@ -58,8 +58,8 @@ def generate_data(machine_number):
     production_series = np.random.normal(spread_production, spread_production * PRODUCTION_VARIABILITY, DATA_POINTS)
 
     # Calculate power consumption
-    power_consumption = (1 + OVEN_AGE * AGING_FACTOR) * (
-            production_series * GLASS_CONSUMPTION * DATA_POINTS / HOURS_PER_DAY) * WATTS_PER_KILOWATT
+    power_consumption = np.round((1 + OVEN_AGE * AGING_FACTOR) * (
+            production_series * GLASS_CONSUMPTION * DATA_POINTS / HOURS_PER_DAY) * WATTS_PER_KILOWATT).astype(int)
 
     # Save to CSV
     df = pd.DataFrame({"ActivePower": power_consumption})
