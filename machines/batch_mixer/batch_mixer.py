@@ -33,7 +33,7 @@ TRANSFER_TIME = 2
 
 # Mixer power draw per ton of raw material mixed
 # This value was obtained as a middle point from the values present in the document at the beginning
-# It states a consumption value of 1 kW/100 kg or 2 kW/ 100 kg depending on mixer type
+# It states a consumption value of 1 kW/100 kg, 2 kW/ 100 kg up to 5 kW/100 kg depending on mixer type
 # The mixers depicted seem significantly smaller than the ones required to process 100 tons per day
 # Therefore, a higher power value was chosen
 # Unit: Kilowatt per ton (kW/t)
