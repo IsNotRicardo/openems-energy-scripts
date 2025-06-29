@@ -19,6 +19,10 @@ NUMBER_OF_MACHINES = 4
 # Unit: Minutes in a day
 DATA_POINTS = 1440
 
+# Increase in energy consumption of the machine due to a fault
+# Unit: Percentage as a decimal (>0)
+FAULT_EXCESS = 0.2
+
 # Production quantity of the forming machine in a day
 # This value depends on demand and on the number of forming machines that are used
 # Unit: Tons (t)
@@ -38,19 +42,23 @@ PRODUCTION_VARIABILITY = 0.01
 # Unit: Kilowatt-hour per ton (kWh/t)
 GLASS_CONSUMPTION = 160
 
-def generate_data(machine_number):
+def generate_data(machine_number, is_faulty):
     # Map production throughout the day with variability
     np.random.seed(48 + machine_number)
     spread_production = PRODUCTION_QUANTITY / DATA_POINTS
     production_series = np.random.normal(spread_production, spread_production * PRODUCTION_VARIABILITY, DATA_POINTS)
 
     # Calculate power consumption
-    power_consumption = np.round((production_series * GLASS_CONSUMPTION * DATA_POINTS / HOURS_PER_DAY)
-                                 * WATTS_PER_KILOWATT).astype(int)
+    power_consumption = (production_series * GLASS_CONSUMPTION * DATA_POINTS / HOURS_PER_DAY) * WATTS_PER_KILOWATT
+
+    if is_faulty:
+        power_consumption *= 1 + FAULT_EXCESS
+
+    power_consumption = np.round(power_consumption).astype(int)
 
     # Save to CSV
     df = pd.DataFrame({"ActivePower": power_consumption})
-    df.to_csv(f"forming_machine{machine_number}.csv", index=False)
+    df.to_csv(f"forming_machine{machine_number}{'_faulty' if is_faulty else ''}.csv", index=False)
 
     # Visualize
     target_x = np.linspace(0, HOURS_PER_DAY, num=DATA_POINTS, endpoint=False)
@@ -65,5 +73,9 @@ def generate_data(machine_number):
 
     print(f"Forming machine {machine_number} CSV file generated successfully.")
 
+i = 0
+
 for i in range(NUMBER_OF_MACHINES):
-    generate_data(i)
+    generate_data(i, False)
+
+generate_data(i + 1, True)

@@ -19,6 +19,10 @@ NUMBER_OF_MACHINES = 2
 # Unit: Minutes in a day
 DATA_POINTS = 1440
 
+# Increase in energy consumption of the machine due to a fault
+# Unit: Percentage as a decimal (>0)
+FAULT_EXCESS = 0.2
+
 # Variability of the data (to simulate realistic conditions)
 # Unit: Percentage as a decimal (0 to 1)
 VARIABILITY = 0.03
@@ -58,7 +62,7 @@ production_duration = mixing_percentage * DATA_POINTS
 material_amount = PRODUCTION_QUANTITY / PRODUCTION_YIELD
 batch_size = MIXING_TIME * material_amount / production_duration
 
-def generate_data(machine_number):
+def generate_data(machine_number, is_faulty):
     # Create a production segment
     if machine_number % 2 == 0:
         production_segment = [batch_size] * MIXING_TIME
@@ -72,17 +76,21 @@ def generate_data(machine_number):
     production_series = np.tile(production_segment, production_repetition)
     production_series = production_series[:DATA_POINTS]
 
-    # Calculate power consumption
-    power_consumption = production_series * MIXER_POWER * WATTS_PER_KILOWATT
-
-    # Introduce variability to power consumption
+    # Introduce variability to production
     np.random.seed(48 + machine_number)
-    variable_power_consumption = np.round(
-        np.random.normal(power_consumption, power_consumption * VARIABILITY)).astype(int)
+    variable_production = np.random.normal(production_series, production_series * VARIABILITY)
+
+    # Calculate power consumption
+    power_consumption = variable_production * MIXER_POWER * WATTS_PER_KILOWATT
+
+    if is_faulty:
+        power_consumption *= 1 + FAULT_EXCESS
+
+    power_consumption = np.round(power_consumption).astype(int)
 
     # Save to CSV
-    df = pd.DataFrame({"ActivePower": variable_power_consumption})
-    df.to_csv(f"batch_mixer{machine_number}.csv", index=False)
+    df = pd.DataFrame({"ActivePower": power_consumption})
+    df.to_csv(f"batch_mixer{machine_number}{'_faulty' if is_faulty else ''}.csv", index=False)
 
     # Visualize
     target_x = np.linspace(0, HOURS_PER_DAY, num=DATA_POINTS, endpoint=False)
@@ -97,5 +105,9 @@ def generate_data(machine_number):
 
     print(f"Batch mixer {machine_number} CSV file generated successfully.")
 
+i = 0
+
 for i in range(NUMBER_OF_MACHINES):
-    generate_data(i)
+    generate_data(i, False)
+
+generate_data(i + 1, True)

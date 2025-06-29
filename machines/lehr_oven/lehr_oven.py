@@ -16,6 +16,10 @@ NUMBER_OF_MACHINES = 4
 # Unit: Minutes in a day
 DATA_POINTS = 1440
 
+# Increase in energy consumption of the machine due to a fault
+# Unit: Percentage as a decimal (>0)
+FAULT_EXCESS = 0.2
+
 # Age of the lehr oven
 # It is taken into account as the refractory lining gradually wears down due to the intense heat
 # Unit: Years
@@ -51,19 +55,24 @@ PRODUCTION_VARIABILITY = 0.03
 # Unit: Kilowatt-hour per ton (kWh/t)
 GLASS_CONSUMPTION = 10
 
-def generate_data(machine_number):
+def generate_data(machine_number, is_faulty):
     # Map production throughout the day with variability
     np.random.seed(48 + machine_number)
     spread_production = PRODUCTION_QUANTITY / DATA_POINTS
     production_series = np.random.normal(spread_production, spread_production * PRODUCTION_VARIABILITY, DATA_POINTS)
 
     # Calculate power consumption
-    power_consumption = np.round((1 + OVEN_AGE * AGING_FACTOR) * (
-            production_series * GLASS_CONSUMPTION * DATA_POINTS / HOURS_PER_DAY) * WATTS_PER_KILOWATT).astype(int)
+    power_consumption = (1 + OVEN_AGE * AGING_FACTOR) * (
+            production_series * GLASS_CONSUMPTION * DATA_POINTS / HOURS_PER_DAY) * WATTS_PER_KILOWATT
+
+    if is_faulty:
+        power_consumption *= 1 + FAULT_EXCESS
+
+    power_consumption = np.round(power_consumption).astype(int)
 
     # Save to CSV
     df = pd.DataFrame({"ActivePower": power_consumption})
-    df.to_csv(f"lehr_oven{machine_number}.csv", index=False)
+    df.to_csv(f"lehr_oven{machine_number}{'_faulty' if is_faulty else ''}.csv", index=False)
 
     # Visualize
     target_x = np.linspace(0, HOURS_PER_DAY, num=DATA_POINTS, endpoint=False)
@@ -78,5 +87,9 @@ def generate_data(machine_number):
 
     print(f"Lehr oven {machine_number} CSV file generated successfully.")
 
+i = 0
+
 for i in range(NUMBER_OF_MACHINES):
-    generate_data(i)
+    generate_data(i, False)
+
+generate_data(i + 1, True)
