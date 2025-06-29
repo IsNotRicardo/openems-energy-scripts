@@ -33,7 +33,7 @@ FOREHEARTH_AGE = 2
 AGING_FACTOR = 0.02
 
 # Production quantity of the forehearth in one day
-# This value depends on product demand, and is also dependent on the furnace output
+# This value depends on product demand and on the furnace output
 # In most factories, production from the furnace is split across multiple forehearths
 # Therefore, production values are likely a fraction than those of the furnace
 # This value is then spread throughout the day evenly, with some variability
@@ -42,7 +42,7 @@ PRODUCTION_QUANTITY = 50
 
 # Production variability throughout the day
 # The value is likely similar to that of the furnace, since the forehearth depends on the furnace output
-# The forehearth needs to feed the forming machine which requires constant output while handling the variable input
+# The forehearth needs to feed the forming machine, which requires constant output while handling the variable input
 # Unit: Percentage as a decimal (0 to 1)
 PRODUCTION_VARIABILITY = 0.03
 
